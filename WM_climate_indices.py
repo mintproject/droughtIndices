@@ -23,14 +23,14 @@ import ast
 ## CHIRPS
 def openCHIRPS(dataset_name, bounding_box):
     """ Open CHIRPS dataset and returns the data
-    
+
     Args:
         dataset_name (str): The name of the CHIRPS dataset
         bounding_box (list): lat/lon to cut to appropriate size
-    
+
     Returns:
         da_precip (Xarra DataArray): A dataArray of precipitation
-    
+
     """
     data = xr.open_dataset(dataset_name)
     p_ = data.sel(latitude=slice(bounding_box[2], bounding_box[3]),\
@@ -42,18 +42,18 @@ def openCHIRPS(dataset_name, bounding_box):
 
 def openGLDAS(dataset_name, bounding_box, periodicity):
     """Open GLDAS datasets and return precipitation and temperature
-    
+
     Args:
         dataset_name (str): The name of the GLDAS folder
         bounding_box (list): lat/lon to cut to appropriate size
-    
+
     Returns:
         da_precip (Xarra DataArray): A dataArray of precipitation
         da_precip_groupby (Xarray DataArray): Xarray dataarray containing
             the precipitation data grouped by lat/lon
         da_temp (Xarra DataArray): A dataArray of temperature
         da_temp_groupby (Xarray DataArray): Xarray dataarray containing
-            the temperature data grouped by lat/lon      
+            the temperature data grouped by lat/lon
     """
 
     # Loop over all datasets in the various folders to get the data
@@ -91,7 +91,7 @@ def openGLDAS(dataset_name, bounding_box, periodicity):
     t = t-273.15
     da_temp.values = t
     da_temp.attrs['units'] = 'C'
-    
+
     return da_precip, da_temp
 #%% Compute indices from xarray-like dataset
 
@@ -101,27 +101,27 @@ def SPI(da_precip, distribution = 'gamma', periodicity = 'monthly',\
         calibration_start_year = 'beginning',\
         calibration_end_year = 'end'):
     """Calculate SPI from precipitation
-    
+
     This function uses the SPI calculation from the climate indices package
-    
+
     Args:
         da_precip (Xarray DataArray): A dataArray of precipitation
         distribution (str): The distribution used to fit the data. Default is
             'gamma'. To use a Pearson Type III distribution, enter 'pearson'
         periodicity (str): Either 'monthly' or 'daily'
         scales (int): The timescales on which the index is computed, either 6 or 12.
-            Default is 6. 
+            Default is 6.
         data_start_year: Year to start computing  SPI - Default is first year in the data
         data_end_year: Year to stop computing  SPI - Default is first year in the data
         calibration_start_year: Start year for the calibration - Defauls is first year in the data
         calibration_end_year: End year for the calibration - Default is to set a 30-year  period,
             or the full dataset if shorter than 30 years
-    
+
     Returns:
-        ds_spi (Xarray DataArray): SPI index  DataArray   
+        ds_spi (Xarray DataArray): SPI index  DataArray
         info (dict): Dictionary containing relevant information about the calib period
     """
-    
+
     #Perform some checks
     assert scales==6 or scales==12, 'Valid entries for timescales field should be 6 or 12'
     assert distribution == 'gamma' or distribution == 'pearson', "Valid entries for distribution field should be 'gamma' or pearson'"
@@ -131,7 +131,7 @@ def SPI(da_precip, distribution = 'gamma', periodicity = 'monthly',\
         dist = indices.Distribution.gamma
     elif distribution == 'pearson':
         dist = indices.Distribution.pearson
-    
+
     if periodicity == 'monthly':
         period = compute.Periodicity.monthly
     if periodicity == 'daily':
@@ -139,40 +139,40 @@ def SPI(da_precip, distribution = 'gamma', periodicity = 'monthly',\
 
     if data_start_year == 'beginning':
         data_start_year = int(np.min(da_precip.time.dt.year))
-    elif data_start_year not in da_precip.time.dt.year.values: 
+    elif data_start_year not in da_precip.time.dt.year.values:
         print('Start year not in dataset, using first available year')
         data_start_year = int(np.min(da_precip.time.dt.year))
-    
+
     if data_end_year == 'end':
         data_end_year = int(np.max(da_precip.time.dt.year))
-    elif data_end_year not in da_precip.time.dt.year.values: 
+    elif data_end_year not in da_precip.time.dt.year.values:
         print('Start year not in dataset, using first available year')
         data_end_year = int(np.max(da_precip.time.dt.year))
-    
+
     if calibration_start_year == 'beginning':
         calibration_start_year = int(np.min(da_precip.time.dt.year))
-    elif calibration_start_year not in da_precip.time.dt.year.values: 
+    elif calibration_start_year not in da_precip.time.dt.year.values:
         print('Calibration start year not in dataset, using first available year')
-        calibration_start_year = int(np.min(da_precip.time.dt.year)) 
-    
+        calibration_start_year = int(np.min(da_precip.time.dt.year))
+
     if calibration_end_year == 'end':
         calibration_end_year = calibration_start_year + 29
         if calibration_end_year not in da_precip.time.dt.year.values:
             calibration_end_year = int(np.max(da_precip.time.dt.year))
-    elif calibration_end_year not in da_precip.time.dt.year.values: 
+    elif calibration_end_year not in da_precip.time.dt.year.values:
         print('Calibration end year not in dataset, using 30yr window or end of dataset')
         calibration_end_year = calibration_start_year + 29
         if calibration_end_year not in da_precip.time.dt.year.values:
             calibration_end_year = int(np.max(da_precip.time.dt.year))
-    
+
     #Groupby
     if 'lat' in da_precip.coords:
         da_precip_groupby = da_precip.stack(point=('lat', 'lon')).groupby('point')
     elif 'latitude' in da_precip.coords:
         da_precip_groupby = da_precip_groupby = da_precip.stack(point=('latitude', 'longitude')).groupby('point')
     else:
-        raise KeyError('latitude not found')    
-    
+        raise KeyError('latitude not found')
+
     #Perform calculation
     da_spi = xr.apply_ufunc(indices.spi,
                         da_precip_groupby,
@@ -192,47 +192,47 @@ def SPI(da_precip, distribution = 'gamma', periodicity = 'monthly',\
     da_spi_cut = np.take(da_spi,r,axis=da_spi.dims.index('time'))
     da_spi_cut['time'] = da_spi_cut.time[r]
     ds_spi=da_spi_cut.to_dataset(name='spi') #convert to xarrayDataset
-    
+
     info = {'index':'SPI',
             'calibration_start': calibration_start_year,
             'calibration_end':  calibration_end_year,
             'distribution': distribution,
             'periodicity': periodicity,
             'timescales': scales}
-    
+
     return ds_spi, info
 
 ## PET
 def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
     """Calculate PET from temperature
-    
+
     This function uses the PET calculation from the climate indices package.
     Monhtly only.
     Uses Thornthwaite equation.
-    
+
     Args:
         da_temp (Xarray DataArray): A dataArray of temperature
         data_start_year: Year to start computing  SPI - Default is first year in the data
         data_end_year: Year to stop computing  SPI - Default is first year in the data
-    
+
     Returns:
         ds_pet (Xarray DataSet): PET index (mm/month)
         da_pet (Xarray DataArray): PET index for full length of data (mm/month). To use with SPEI function
         info (dict): Dictionary containing relevant information
     """
-    
+
     if data_start_year == 'beginning':
         data_start_year = int(np.min(da_precip.time.dt.year))
-    elif data_start_year not in da_precip.time.dt.year.values: 
+    elif data_start_year not in da_precip.time.dt.year.values:
         print('Start year not in dataset, using first available year')
         data_start_year = int(np.min(da_precip.time.dt.year))
-    
+
     if data_end_year == 'end':
         data_end_year = int(np.max(da_precip.time.dt.year))
-    elif data_end_year not in da_precip.time.dt.year.values: 
+    elif data_end_year not in da_precip.time.dt.year.values:
         print('End year not in dataset, using last available year')
-        data_end_year = int(np.max(da_precip.time.dt.year))   
-    
+        data_end_year = int(np.max(da_precip.time.dt.year))
+
     #get latitude
     if 'lat' in da_temp.coords:
         lat = np.array(da_temp['lat'].values)
@@ -240,20 +240,20 @@ def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
         lat = np.array(da_temp['latitude'].values)
     else:
         raise KeyError('latitude not found')
-    
+
     #Make sure that we have full years in the data or truncate
     if int(da_precip.time[0].dt.month) != 1:
         print("Full year not available for the beginning of the record, truncating...")
         start_year = int(da_precip.time.dt.year[1])
     else:
         start_year = int(da_precip.time.dt.year[0])
-    
+
     if int(da_precip.time[-1].dt.month) != 12:
         print("Full year not available for the end of the record, truncating...")
         end_year = int(da_precip.time.dt.year[-2])
     else:
         end_year = int(da_precip.time.dt.year[-1])
-    
+
     #cut the data if entire years are not available.
     min_idx = np.where(da_temp.time.dt.year>=start_year)[0][0]
     max_idx = np.where(da_temp.time.dt.year<=end_year)[0][-1]
@@ -261,7 +261,7 @@ def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
     #cut along the right dimensions
     da_temp_cut = np.take(da_temp,r,axis=da_temp.dims.index('time'))
     da_temp_cut['time'] = da_temp_cut.time[r]
-    
+
     #Groupby
     if 'lat' in da_temp.coords:
         da_temp_groupby = da_temp.stack(point=('lat', 'lon')).groupby('point')
@@ -269,7 +269,7 @@ def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
         da_temp_groupby = da_temp.stack(point=('latitude', 'longitude')).groupby('point')
     else:
         raise KeyError('latitude not found')
-    
+
     # perform calculation
     da_pet = xr.apply_ufunc(indices.pet,
                             da_temp_groupby,
@@ -291,9 +291,9 @@ def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
     da_pet_cut = np.take(da_pet,r,axis=da_pet.dims.index('time'))
     da_pet_cut['time'] = da_pet_cut.time[r]
     ds_pet=da_pet_cut.to_dataset(name='pet')
-    
+
     info={'index':'PET'}
-    
+
     return ds_pet, da_pet, info
 
 def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
@@ -301,9 +301,9 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
         calibration_start_year = 'beginning',\
         calibration_end_year = 'end'):
     """Calculate SPI from precipitation
-    
+
     This function uses the SPI calculation from the climate indices package
-    
+
     Args:
         da_precip (Xarray DataArray): A dataArray of precipitation
         da_temp (Xarray DataArray): A datarray of temperature values
@@ -311,18 +311,18 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
             'gamma'. To use a Pearson Type III distribution, enter 'pearson'
         periodicity (str): Either 'monthly' or 'daily'
         scales (int): The timescales on which the index is computed, either 6 or 12.
-            Default is 6. 
+            Default is 6.
         data_start_year: Year to start computing  SPI - Default is first year in the data
         data_end_year: Year to stop computing  SPI - Default is first year in the data
         calibration_start_year: Start year for the calibration - Defauls is first year in the data
         calibration_end_year: End year for the calibration - Default is to set a 30-year  period,
             or the full dataset if shorter than 30 years
-    
+
     Returns:
-        ds_spi (Xarray DataSet): SPEI index  DataArray   
+        ds_spi (Xarray DataSet): SPEI index  DataArray
         info (dict): Dictionary containing relevant information about the calib period
     """
-    
+
     #Perform some checks
     assert scales==6 or scales==12, 'Valid entries for timescales field should be 6 or 12'
     assert distribution == 'gamma' or distribution == 'pearson', "Valid entries for distribution field should be 'gamma' or pearson'"
@@ -332,7 +332,7 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
         dist = indices.Distribution.gamma
     elif distribution == 'pearson':
         dist = indices.Distribution.pearson
-    
+
     if periodicity == 'monthly':
         period = compute.Periodicity.monthly
     if periodicity == 'daily':
@@ -340,36 +340,36 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
 
     if data_start_year == 'beginning':
         data_start_year = int(np.min(da_precip.time.dt.year))
-    elif data_start_year not in da_precip.time.dt.year.values: 
+    elif data_start_year not in da_precip.time.dt.year.values:
         print('Start year not in dataset, using first available year')
         data_start_year = int(np.min(da_precip.time.dt.year))
-    
+
     if data_end_year == 'end':
         data_end_year = int(np.max(da_precip.time.dt.year))
-    elif data_end_year not in da_precip.time.dt.year.values: 
+    elif data_end_year not in da_precip.time.dt.year.values:
         print('End year not in dataset, using last available year')
         data_end_year = int(np.max(da_precip.time.dt.year))
-    
+
     if calibration_start_year == 'beginning':
         calibration_start_year = int(np.min(da_precip.time.dt.year))
-    elif calibration_start_year not in da_precip.time.dt.year.values: 
+    elif calibration_start_year not in da_precip.time.dt.year.values:
         print('Calibration start year not in dataset, using first available year')
-        calibration_start_year = int(np.min(da_precip.time.dt.year)) 
-    
+        calibration_start_year = int(np.min(da_precip.time.dt.year))
+
     if calibration_end_year == 'end':
         calibration_end_year = calibration_start_year + 29
         if calibration_end_year not in da_precip.time.dt.year.values:
             calibration_end_year = int(np.max(da_precip.time.dt.year))
-    elif calibration_end_year not in da_precip.time.dt.year.values: 
+    elif calibration_end_year not in da_precip.time.dt.year.values:
         print('Calibration end year not in dataset, using 30yr window or end of dataset')
         calibration_end_year = calibration_start_year + 29
         if calibration_end_year not in da_precip.time.dt.year.values:
             calibration_end_year = int(np.max(da_precip.time.dt.year))
-    
+
     #compute pet
     ds_pet,da_pet,info = PET(da_temp,data_start_year,\
                              data_end_year)
-    
+
     #Resize the da_precip array as needed
     if np.min(da_precip.time.dt.year) != np.min(da_pet.time.dt.year):
         min_idx = np.where(da_precip.time.dt.year>=np.min(da_pet.time.dt.year))[0][0]
@@ -381,7 +381,7 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
         max_idx = da_pet.time.size-1
     r = np.arange(min_idx,max_idx+1,1)
     da_precip_cut = np.take(da_precip,r,axis=da_precip.dims.index('time'))
-    
+
     #groupby
     if 'lat' in da_temp.coords:
         da_precip_groupby = da_precip_cut.stack(point=('lat', 'lon')).groupby('point')
@@ -391,7 +391,7 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
         da_pet_groupby = da_pet.stack(point=('latitude', 'longitude')).groupby('point')
     else:
         raise KeyError('latitude not found')
-        
+
     #perform the calculation
     da_spei=xr.apply_ufunc(indices.spei,
                           da_precip_groupby,
@@ -402,7 +402,7 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
                           data_start_year,
                           calibration_start_year,
                           calibration_end_year)
-    
+
     #Cut to the right years
     da_spei = da_spei.unstack('point')
     min_idx = np.where(da_spei.time.dt.year>=data_start_year)[0][0]
@@ -411,26 +411,26 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
     da_spei_cut = np.take(da_spei,r,axis=da_spei.dims.index('time'))
     da_spei_cut['time'] = da_spei_cut.time[r]
     ds_spei=da_spei_cut.to_dataset(name='spei') #convert to xarrayDataset
-    
+
     info = {'index':'SPEI',
             'calibration_start': calibration_start_year,
             'calibration_end':  calibration_end_year,
             'distribution': distribution,
             'periodicity': periodicity,
             'timescales': scales}
-    return ds_spei, info   
+    return ds_spei, info
 #%% Return a netcdf using MINT conventions
 def to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out):
     """Returns a MINT-ready netcdf file with SPI values
-    
+
     Args:
         ds (Xarray DataSet): A dataset of drought indices
         info (dict): Dictionary containing pertinent information frpm calculation
         dir_out (str): The out directory to write the netcdf files
-          
+
     Returns:
         NetCDF ouput in MINT Format
-    
+
     """
     #Adding the global attributes
     ds.attrs['conventions'] = 'MINT-1.0'
@@ -467,11 +467,11 @@ def to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out):
     ds.attrs['time_coverage_start'] = str(ds.time.values[0])
     ds.attrs['time_coverage_end'] = str(ds.time.values[-1])
     ds.attrs['time_coverage_resolution'] = info['periodicity']
-    ds.attrs['geostatial_lat_min'] = bounding_box[2]
+    ds.attrs['geospatial_lat_min'] = bounding_box[2]
     ds.attrs['geospatial_lat_max'] = bounding_box[3]
     ds.attrs['geospatial_lon_min'] = bounding_box[0]
     ds.attrs['geospatial_lon_max'] = bounding_box[1]
-    
+
     # Adding var attributes
     if info['index'] == 'SPI':
        ds.spi.attrs['title'] = 'Standardized Precipitation Index'
@@ -515,8 +515,8 @@ def to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out):
                 ds.attrs['time_coverage_end'].split('T')[0]+\
                 '_'+ds.attrs['id']+'.nc'
     ds.to_netcdf(path = path)
-    
-#%% Main 
+
+#%% Main
 #dataset_type = sys.argv[1]
 #index = sys.argv[2]
 #dataset_name = sys.argv[3] #file name or directory name
@@ -524,7 +524,7 @@ def to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out):
 #distribution = sys.argv[5].lower()
 #periodicity = sys.argv[6].lower()
 #scales = int(sys.argv[7])
-#try: 
+#try:
 #    data_start_year= int(sys.argv[8])
 #except:
 #    data_start_year = sys.argv[8]
@@ -585,7 +585,7 @@ if dataset_type == 'CHIRPS':
     da_precip = openCHIRPS(dataset_name, bounding_box)
 elif dataset_type == 'GLDASv2.0' or dataset_type == 'GLDASv2.1':
     da_precip,da_temp = openGLDAS(dataset_name, bounding_box, periodicity)
-## Perform calcuculations    
+## Perform calcuculations
 if index == 'SPI':
     ds, info = SPI(da_precip, distribution, periodicity, scales,\
                        data_start_year, data_end_year, calibration_start_year, calibration_end_year)
@@ -596,4 +596,3 @@ elif index == 'SPEI':
                         data_start_year, data_end_year, calibration_start_year, calibration_end_year)
 ## Write to file
 to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out)
-
