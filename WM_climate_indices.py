@@ -517,44 +517,44 @@ def to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out):
     ds.to_netcdf(path = path)
 
 #%% Main
-#dataset_type = sys.argv[1]
-#index = sys.argv[2]
-#dataset_name = sys.argv[3] #file name or directory name
-#bounding_box = ast.literal_eval(sys.argv[4])
-#distribution = sys.argv[5].lower()
-#periodicity = sys.argv[6].lower()
-#scales = int(sys.argv[7])
-#try:
-#    data_start_year= int(sys.argv[8])
-#except:
-#    data_start_year = sys.argv[8]
-#try:
-#    data_end_year = int(sys.argv[9])
-#except:
-#    data_end_year = sys.argv[9]
-#try:
-#    calibration_start_year = int(sys.argv[10])
-#except:
-#    calibration_start_year = sys.argv[10]
-#try:
-#    calibration_end_year = int(sys.argv[11])
-#except:
-#    calibration_end_year = sys.argv[11]
-#dir_out = sys.argv[12]
+dataset_type = sys.argv[1]
+index = sys.argv[2]
+dataset_name = sys.argv[3] #file name or directory name
+bounding_box = ast.literal_eval(sys.argv[4])
+distribution = sys.argv[5].lower()
+periodicity = sys.argv[6].lower()
+scales = int(sys.argv[7])
+try:
+    data_start_year= int(sys.argv[8])
+except:
+    data_start_year = sys.argv[8]
+try:
+    data_end_year = int(sys.argv[9])
+except:
+    data_end_year = sys.argv[9]
+try:
+    calibration_start_year = int(sys.argv[10])
+except:
+    calibration_start_year = sys.argv[10]
+try:
+    calibration_end_year = int(sys.argv[11])
+except:
+    calibration_end_year = sys.argv[11]
+dir_out = sys.argv[12]
 
 #Test
-dataset_type = 'GLDASv2.1'
-index = 'PET'
-dataset_name = 'GLDASv2.1' #file name or directory name
-bounding_box = [23,48,3,15]
-distribution = 'gamma'
-periodicity = 'monthly'
-scales = 6
-data_start_year= 2010
-data_end_year = 2018
-calibration_start_year = 1981
-calibration_end_year = 2010
-dir_out = '/Users/deborahkhider/Desktop/'
+#dataset_type = 'GLDASv2.1'
+#index = 'PET'
+#dataset_name = 'GLDASv2.1' #file name or directory name
+#bounding_box = [23,48,3,15]
+#distribution = 'gamma'
+#periodicity = 'monthly'
+#scales = 6
+#data_start_year= 2010
+#data_end_year = 2018
+#calibration_start_year = 1981
+#calibration_end_year = 2010
+#dir_out = '/Users/deborahkhider/Desktop/'
 
 ## Perform checks:
 #possible datatypes
