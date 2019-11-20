@@ -517,82 +517,83 @@ def to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out):
     ds.to_netcdf(path = path)
 
 #%% Main
-dataset_type = sys.argv[1]
-index = sys.argv[2]
-dataset_name = sys.argv[3] #file name or directory name
-bounding_box = ast.literal_eval(sys.argv[4])
-distribution = sys.argv[5].lower()
-periodicity = sys.argv[6].lower()
-scales = int(sys.argv[7])
-try:
-    data_start_year= int(sys.argv[8])
-except:
-    data_start_year = sys.argv[8]
-try:
-    data_end_year = int(sys.argv[9])
-except:
-    data_end_year = sys.argv[9]
-try:
-    calibration_start_year = int(sys.argv[10])
-except:
-    calibration_start_year = sys.argv[10]
-try:
-    calibration_end_year = int(sys.argv[11])
-except:
-    calibration_end_year = sys.argv[11]
-dir_out = sys.argv[12]
-
-#Test
-#dataset_type = 'GLDASv2.1'
-#index = 'PET'
-#dataset_name = 'GLDASv2.1' #file name or directory name
-#bounding_box = [23,48,3,15]
-#distribution = 'gamma'
-#periodicity = 'monthly'
-#scales = 6
-#data_start_year= 2010
-#data_end_year = 2018
-#calibration_start_year = 1981
-#calibration_end_year = 2010
-#dir_out = '/Users/deborahkhider/Desktop/'
-
-## Perform checks:
-#possible datatypes
-dataset_type_list = ['CHIRPS','GLDASv2.0','GLDASv2.1']
-assert dataset_type in dataset_type_list, 'Dataset type not recognized'
-#possible indices
-index_list = ['SPI', 'PET', 'SPEI']
-assert index in index_list, 'Index calculation not supported'
-#Some combinations are invalid
-if dataset_type == 'CHIRPS':
-    assert index != 'PET', 'PET index calculation not supported with CHIRPS data'
-    assert index != 'SPEI', 'SPEI index calculation not supported with CHIRPS data'
-#beginning and end years
-if calibration_start_year != 'beginning':
-    calibration_start_year = int(calibration_start_year)
-if calibration_end_year != 'end':
-    calibration_end_year = int(calibration_end_year)
-if data_start_year != 'beginning':
-    data_start_year = int(data_start_year)
-assert calibration_start_year<calibration_end_year, 'The beginning of the calibration period should be set prior to the end'
-assert data_start_year<data_end_year, 'The beginning of the simulationperiod should be set prior to the end'
-#periodicity
-assert periodicity =='monthly', "Monthly periodicity only"
-#Scales
-assert scales == 6 or scales == 12, 'Scales should be 6 or 12'
-## Open datasets
-if dataset_type == 'CHIRPS':
-    da_precip = openCHIRPS(dataset_name, bounding_box)
-elif dataset_type == 'GLDASv2.0' or dataset_type == 'GLDASv2.1':
-    da_precip,da_temp = openGLDAS(dataset_name, bounding_box, periodicity)
-## Perform calcuculations
-if index == 'SPI':
-    ds, info = SPI(da_precip, distribution, periodicity, scales,\
-                       data_start_year, data_end_year, calibration_start_year, calibration_end_year)
-elif index == 'PET':
-    ds, da_pet, info = PET(da_temp,data_start_year,data_end_year)
-elif index == 'SPEI':
-    ds, info = SPEI(da_precip, da_temp,distribution, periodicity, scales,\
-                        data_start_year, data_end_year, calibration_start_year, calibration_end_year)
-## Write to file
-to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out)
+if __name__ == "__main__":
+    dataset_type = sys.argv[1]
+    index = sys.argv[2]
+    dataset_name = sys.argv[3] #file name or directory name
+    bounding_box = ast.literal_eval(sys.argv[4])
+    distribution = sys.argv[5].lower()
+    periodicity = sys.argv[6].lower()
+    scales = int(sys.argv[7])
+    try:
+        data_start_year= int(sys.argv[8])
+    except:
+        data_start_year = sys.argv[8]
+    try:
+        data_end_year = int(sys.argv[9])
+    except:
+        data_end_year = sys.argv[9]
+    try:
+        calibration_start_year = int(sys.argv[10])
+    except:
+        calibration_start_year = sys.argv[10]
+    try:
+        calibration_end_year = int(sys.argv[11])
+    except:
+        calibration_end_year = sys.argv[11]
+    dir_out = sys.argv[12]
+    
+    #Test
+    #dataset_type = 'GLDASv2.1'
+    #index = 'PET'
+    #dataset_name = 'GLDASv2.1' #file name or directory name
+    #bounding_box = [23,48,3,15]
+    #distribution = 'gamma'
+    #periodicity = 'monthly'
+    #scales = 6
+    #data_start_year= 2010
+    #data_end_year = 2018
+    #calibration_start_year = 1981
+    #calibration_end_year = 2010
+    #dir_out = '/Users/deborahkhider/Desktop/'
+    
+    ## Perform checks:
+    #possible datatypes
+    dataset_type_list = ['CHIRPS','GLDASv2.0','GLDASv2.1']
+    assert dataset_type in dataset_type_list, 'Dataset type not recognized'
+    #possible indices
+    index_list = ['SPI', 'PET', 'SPEI']
+    assert index in index_list, 'Index calculation not supported'
+    #Some combinations are invalid
+    if dataset_type == 'CHIRPS':
+        assert index != 'PET', 'PET index calculation not supported with CHIRPS data'
+        assert index != 'SPEI', 'SPEI index calculation not supported with CHIRPS data'
+    #beginning and end years
+    if calibration_start_year != 'beginning':
+        calibration_start_year = int(calibration_start_year)
+    if calibration_end_year != 'end':
+        calibration_end_year = int(calibration_end_year)
+    if data_start_year != 'beginning':
+        data_start_year = int(data_start_year)
+    assert calibration_start_year<calibration_end_year, 'The beginning of the calibration period should be set prior to the end'
+    assert data_start_year<data_end_year, 'The beginning of the simulationperiod should be set prior to the end'
+    #periodicity
+    assert periodicity =='monthly', "Monthly periodicity only"
+    #Scales
+    assert scales == 6 or scales == 12, 'Scales should be 6 or 12'
+    ## Open datasets
+    if dataset_type == 'CHIRPS':
+        da_precip = openCHIRPS(dataset_name, bounding_box)
+    elif dataset_type == 'GLDASv2.0' or dataset_type == 'GLDASv2.1':
+        da_precip,da_temp = openGLDAS(dataset_name, bounding_box, periodicity)
+    ## Perform calcuculations
+    if index == 'SPI':
+        ds, info = SPI(da_precip, distribution, periodicity, scales,\
+                           data_start_year, data_end_year, calibration_start_year, calibration_end_year)
+    elif index == 'PET':
+        ds, da_pet, info = PET(da_temp,data_start_year,data_end_year)
+    elif index == 'SPEI':
+        ds, info = SPEI(da_precip, da_temp,distribution, periodicity, scales,\
+                            data_start_year, data_end_year, calibration_start_year, calibration_end_year)
+    ## Write to file
+    to_netcdfMint(ds, info, dataset_type, bounding_box, dir_out)
