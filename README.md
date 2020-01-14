@@ -15,7 +15,7 @@ Model to calculate various drought indices from precipitation/temperature data.
 
 ## <a name = "what">What is it?</a>
 
-This Python routine calculates three climate indices based on NetCDF input data from [CHIRPS](https://www.chc.ucsb.edu/data/chirps) and [GLDAS](https://ldas.gsfc.nasa.gov/gldas):
+This Python routine calculates three climate indices based on NetCDF input data from [CHIRPS](https://www.chc.ucsb.edu/data/chirps), [GLDAS](https://ldas.gsfc.nasa.gov/gldas), and [FLDAS](https://ldas.gsfc.nasa.gov/fldas):
 * [SPI](https://climatedataguide.ucar.edu/climate-data/standardized-precipitation-index-spi): Standardized Precipitation Index, utilizing both gamma and Pearson Type III distributions. - CHIRPS, GLDAS, FLDAS
 * [SPEI](https://www.researchgate.net/publication/252361460_The_Standardized_Precipitation-Evapotranspiration_Index_SPEI_a_multiscalar_drought_index): Standardized Precipitation Evapotranspiration Index, utilizing both gamma and Pearson Type III distributions. - GLDAS, FLDAS
 * [PET](https://www.ncdc.noaa.gov/monitoring-references/dyk/potential-evapotranspiration): Potential Evapotranspiration, utilizing Thornthwaite equation. - GLDAS, FLDAS
