@@ -58,7 +58,7 @@ where:
 - The recommended length of time for calibration is 30 years
 
 Example:
-`python WM_climate_indices.py GLDAS GLDAS2.1_TP_2000_2018.nc /Users/deborahkhider/Desktop/ SPI [23,48,3,15] gamma monthly 6 2000 2017 2008 2017  True`
+`python WM_climate_indices.py GLDAS GLDAS2.1_TP_2000_2018.nc /Users/deborahkhider/Desktop/ SPI [23,48,3,15] gamma monthly 6 2008 2017 2000 2017 True`
 
 Outputs for this particular setup can be found in the folder "ExampleResults"
 
