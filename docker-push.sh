@@ -1,2 +1,2 @@
-docker tag droughtIndices mintproject/droughtIndices:$1
-docker push mintproject/droughtIndices:$1
+docker tag droughtindices mintproject/droughtindices:$1
+docker push mintproject/droughtindices:$1
