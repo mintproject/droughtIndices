@@ -1,0 +1,24 @@
+language: generic
+env:
+  matrix:
+  - DOCKER_COMPOSE_VERSION=1.23.2
+  global:
+services:
+- docker
+before_install:
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+- sudo rm /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname-s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+- docker build -t droughtIndices .
+- docker tag droughtIndices mintproject/droughtIndices:latest
+- docker push mintproject/droughtIndices:latest
+deploy:
+  provider: script
+  script: bash docker-push.sh $TRAVIS_TAG
+  on:
+    tags: true
+    all_branches: true
+  skip_cleanup: true
+
