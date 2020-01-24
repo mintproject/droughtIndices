@@ -649,25 +649,26 @@ def visualizeDroughtIndex(ds, dir_out, info, dataset_type):
         ax.add_feature(cfeature.COASTLINE)
         ax.add_feature(cfeature.RIVERS)
         levels = np.arange(-4,4.2,0.2)
-        img = plt.contourf(lon, lat, v, levels=levels,
-            cmap=cm.BrBG,
-            transform=proj,
-            vmin = -4,
-            vmax =4)
-        tick_range = np.arange(-4,4.5,0.5)
-        cbar = plt.colorbar(img, orientation='horizontal',pad=0.1, ticks=tick_range)
-        string = ', inferred from' + dataset_type +\
-                ' over a calibration period from '+ str(info['calibration_start']) +\
-                ' to '+ str(info['calibration_end']) + ', using a '+info['distribution']+\
-                ' distribution and '+str(info['timescales'])+'-month timescale.'
-        if varname == 'spi':
-            cbar.ax.set_title('Standardized Precipitation Index'+string)
-        elif varname == 'pet':
-            cbar.ax.set_title('Potential Evapotranspiration (mm/month)'+string)
-        elif varname == 'spei':
-            cbar.ax.set_title('Standardized Precipitation-Evapotranspiration Index'+string)
-        else:
-            cbar.ax.set_title(varname)
+        if np.isnan(v).all()==False:
+            img = plt.contourf(lon, lat, v, levels=levels,
+                cmap=cm.BrBG,
+                transform=proj,
+                vmin = -4,
+                vmax =4)
+            tick_range = np.arange(-4,4.5,0.5)
+            cbar = plt.colorbar(img, orientation='horizontal',pad=0.1, ticks=tick_range)
+            string = ', inferred from' + dataset_type +\
+                    ' over a calibration period from '+ str(info['calibration_start']) +\
+                    ' to '+ str(info['calibration_end']) + ', using a '+info['distribution']+\
+                    ' distribution and '+str(info['timescales'])+'-month timescale.'
+            if varname == 'spi':
+                cbar.ax.set_title('Standardized Precipitation Index'+string)
+            elif varname == 'pet':
+                cbar.ax.set_title('Potential Evapotranspiration (mm/month)'+string)
+            elif varname == 'spei':
+                cbar.ax.set_title('Standardized Precipitation-Evapotranspiration Index'+string)
+            else:
+                cbar.ax.set_title(varname)
         gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=2, color='gray', alpha=0.5, linestyle='--')
         gl.xlabels_top = False
