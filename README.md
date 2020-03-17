@@ -9,7 +9,7 @@ Model to calculate various drought indices from precipitation/temperature data.
 * [Version Information](#version)
 * [User Guide](#quickstart)
 * [Requirements](#req)
-* [Files in this repository](#files)
+* [Files and folders in this repository](#files)
 * [Contact](#contact)
 * [License](#license)
 
@@ -25,7 +25,7 @@ This package is based upon [Climate Indices in Python](https://github.com/monoco
 This project builds upon this software package to include additional sources of climate data, namely GLDAS and CHIRPS.
 
 ## <a name = "version">Version information</a>
-* v0.1.0: Support for datasets from FLDAS and combined netcdf file. Visualization support for SPI and SPEI.
+* v1.0.0: Support for datasets from FLDAS and combined netcdf file. Visualization support for SPI and SPEI. - First release
 * v0.0.1: Support for three indices and datasets from CHIRPS and GLDAS
 
 ## <a name = "quickstart">User Guide</a>
@@ -75,11 +75,11 @@ Package requirements:
 * climate-indices - 1.0.6 Install this package from source (not pip) -> https://github.com/monocongo/climate_indices
 * cftime - 1.0.4.2
 * cartopy - 0.17.0 Install using conda `conda install -c conda-forge cartopy`
-*  matplotlib - 3.1.0
+* matplotlib - 3.1.0
 * imageio - 2.6.1
 * imageio-ffmpeg - 0.3.0
 
-## <a name = "files">Files in this directory</a>
+## <a name = "files">Files and folders in this directory</a>
 
 * WM_climate_indices.py: Executable (climate indices calculation)
 
