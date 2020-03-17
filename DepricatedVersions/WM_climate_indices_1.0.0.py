@@ -685,9 +685,9 @@ def visualizeDroughtIndex(ds, dir_out, info, dataset_type):
         plt.title(date, fontsize=18, loc='left', pad=1)
         #save a jepg
         if dir_out[-1]=='/':
-            filename = dir_out+'figures/'+varname+'_t'+str(date)+'.jpeg'
+            filename = dir_out+'figures/'+varname+'_t'+str(date)+'.png'
         else:
-            filename = dir_out+'/figures/'+varname+'_t'+str(date)+'.jpeg'
+            filename = dir_out+'/figures/'+varname+'_t'+str(date)+'.png'
         filenames.append(filename)
         plt.savefig(filename)
         plt.close(fig)
