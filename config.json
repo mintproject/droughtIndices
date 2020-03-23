@@ -1,0 +1,29 @@
+{
+"data" :
+  {
+  "dataset_name" : "ECMWF.nc",
+  "dataset_type" : "ECMWF"
+},
+"output" :
+  {
+  "path" : "./",
+  "fig" : "True"
+},
+"index" :
+  {
+  "name" : "SPI",
+  "distribution" : "gamma",
+  "periodicity" : "monthly",
+  "scales" : "6",
+  "data_start_year" : "2010",
+  "data_end_year" : "2018",
+  "calibration_start_year" : "1981",
+  "calibration_end_year" : "2010"
+},
+"spatial" :
+  {
+  "global" : "False",
+  "bounding_box": "[23,48,3,15]"
+},
+"debug" : "False"
+}

@@ -15,16 +15,17 @@ Model to calculate various drought indices from precipitation/temperature data.
 
 ## <a name = "what">What is it?</a>
 
-This Python routine calculates three climate indices based on NetCDF input data from [CHIRPS](https://www.chc.ucsb.edu/data/chirps), [GLDAS](https://ldas.gsfc.nasa.gov/gldas), and [FLDAS](https://ldas.gsfc.nasa.gov/fldas):
-* [SPI](https://climatedataguide.ucar.edu/climate-data/standardized-precipitation-index-spi): Standardized Precipitation Index, utilizing both gamma and Pearson Type III distributions. - CHIRPS, GLDAS, FLDAS
-* [SPEI](https://www.researchgate.net/publication/252361460_The_Standardized_Precipitation-Evapotranspiration_Index_SPEI_a_multiscalar_drought_index): Standardized Precipitation Evapotranspiration Index, utilizing both gamma and Pearson Type III distributions. - GLDAS, FLDAS
-* [PET](https://www.ncdc.noaa.gov/monitoring-references/dyk/potential-evapotranspiration): Potential Evapotranspiration, utilizing Thornthwaite equation. - GLDAS, FLDAS
+This Python routine calculates three climate indices based on NetCDF input data from [CHIRPS](https://www.chc.ucsb.edu/data/chirps), [GLDAS](https://ldas.gsfc.nasa.gov/gldas), [FLDAS](https://ldas.gsfc.nasa.gov/fldas), [ECMWF](https://www.ecmwf.int/en/forecasts/datasets/reanalysis-datasets/era5):
+* [SPI](https://climatedataguide.ucar.edu/climate-data/standardized-precipitation-index-spi): Standardized Precipitation Index, utilizing both gamma and Pearson Type III distributions. - CHIRPS, GLDAS, FLDAS, ECMWF
+* [SPEI](https://www.researchgate.net/publication/252361460_The_Standardized_Precipitation-Evapotranspiration_Index_SPEI_a_multiscalar_drought_index): Standardized Precipitation Evapotranspiration Index, utilizing both gamma and Pearson Type III distributions. - GLDAS, FLDAS, ECMWF
+* [PET](https://www.ncdc.noaa.gov/monitoring-references/dyk/potential-evapotranspiration): Potential Evapotranspiration, utilizing Thornthwaite equation. - GLDAS, FLDAS, ECMWF
 
 This package is based upon [Climate Indices in Python](https://github.com/monocongo/climate_indices). The Climate Indices in Python project contains implementations of various algorithms which provide a geographical and temporal picture of the severity of precipitation and temperature anomalies for climate monitoring and research.
 
-This project builds upon this software package to include additional sources of climate data, namely GLDAS and CHIRPS.
+This project builds upon this software package to include additional sources of climate data.
 
 ## <a name = "version">Version information</a>
+* v1.1.0: Support for datasets from ECMWF, use JSON for configuration, optimization using xarray
 * v1.0.0: Support for datasets from FLDAS and combined netcdf file. Visualization support for SPI and SPEI. - First release
 * v0.0.1: Support for three indices and datasets from CHIRPS and GLDAS
 
@@ -32,17 +33,17 @@ This project builds upon this software package to include additional sources of 
 
 Command line implementations:
 
-`python WM_climate_indices.py dataset_type dataset_name dir_out index bounding_box distribution periodicity scales data_start_year data_end_year calibration_start_year calibration_end_year fig`
+`python WM_climate_indices.py config.json`
 
-where:
+The config.json file contains the following fields:
 * dataset_type: the type of NetCDF files. Valid entries are GLDAS, FLDAS or CHIRPS  
 * dataset_name: Name of dataset file or parent folder
-* dir_out: The out directory to write the index files. Index files are in NetCDF format, visualization in mp4. All years contained in a single file. Two folders will be created: figures (which contains each frame for the movie) and results, which will include both the netcdf and mp4 files. Each dataset is given a unique ID, which can be used to match data and visualization.
-* Index: The index to be calculated.
+* path: The out directory to write the index files. Index files are in NetCDF format, visualization in mp4. All years contained in a single file. Two folders will be created: figures (which contains each frame for the movie) and results, which will include both the netcdf and mp4 files. Each dataset is given a unique ID, which can be used to match data and visualization.
+* fig (bool): If True, will generate a movie.
+* name: The name of the index to be calculated. Valid entries include:
   * SPI: Standardized Precipitation Index, utilizing both gamma and Pearson Type III distributions
   * PET: Potential Evapotranspiration, utilizing Thornthwaite equations
   * SPEI: Standardized Precipitation Evapotranspiration Index, utilizing both gamma and Pearson Type III distributions.
-* bounding_box: List of [min_lon,max_lon,min_lat,max_lat]
 * distribution: Either 'gamma' or 'pearson'
 * periodicity: 'monthly'. Daily calculations are not supported in the current version
 * scales: Either '6' or '12' month
@@ -50,17 +51,14 @@ where:
 * data_end_year: The year for which to end the calculation
 * calibration_start_year: The start year for the calibration
 * calibration_end_year: The end year for the calibration.
-* fig (bool): If True, will generate a movie. PET visualization is not currently supported
+* global: Bool to consider the full geographical extent of the dataset. bounding_box information will be ignored in this case.
+* bounding_box: List of [min_lon,max_lon,min_lat,max_lat]
 
 **Note**:
 - A list of sample data and associated links can be in the data folder in this repository
 - SPEI and PET require temperature inputs, not present in the CHIRPS dataset.
 - The recommended length of time for calibration is 30 years
-
-Example:
-`python WM_climate_indices.py GLDAS GLDAS2.1_TP_2000_2018.nc /Users/deborahkhider/Desktop/ SPI [23,48,3,15] gamma monthly 6 2008 2017 2000 2017 True`
-
-Outputs for this particular setup can be found in the folder "ExampleResults"
+- An example config file is given in this repository
 
 ## <a name = "req">Requirements</a>
 Tested under Python 3.7
@@ -81,7 +79,17 @@ Package requirements:
 
 ## <a name = "files">Files and folders in this directory</a>
 
+### Files
+
 * WM_climate_indices.py: Executable (climate indices calculation)
+* config.json: JSON file containing configurable inputs data and parameters
+
+### Folders
+
+* Data: Link to relevant datasets for use with  the software
+* Docs: Simulation Matrix for the mint mint project
+* ExampleResults: Examples of outputs
+* Utils: Utilities to cut and concatenate netcdf files from FLDAS and GLDAS
 
 ## <a name = "contact">Contact</a>
 
