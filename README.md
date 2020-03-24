@@ -58,6 +58,7 @@ The config.json file contains the following fields:
 - A list of sample data and associated links can be in the data folder in this repository
 - SPEI and PET require temperature inputs, not present in the CHIRPS dataset.
 - The recommended length of time for calibration is 30 years
+- PET calculation requires an entire year of data for  both  calibration and computation. If  not present, will adjust to last/first complete year on record. 
 - An example config file is given in this repository
 
 ## <a name = "req">Requirements</a>

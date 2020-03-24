@@ -379,6 +379,10 @@ def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
     t_end =  str(end_year)+'-12-01T00:00:00.000000000'
     da_temp_cut = da_temp.sel(time=slice(t_start,t_end))
 
+    if len(da_temp_cut.dims) == 4: #Deal with ECMWF data
+        da_temp_cut = da_temp_cut[:,0,:,:]
+    da_temp_cut.load()
+
     #Groupby
     if 'lat' in da_temp.coords:
         da_temp_groupby = da_temp_cut.stack(point=('lat', 'lon')).groupby('point')
@@ -389,9 +393,7 @@ def PET(da_temp, data_start_year = 'beginning', data_end_year = 'end'):
     else:
         raise KeyError('latitude not found')
     # Load the data
-    if len(da_temp.dims) == 4: #Deal with ECMWF data
-        da_temp = da_temp[:,0,:,:]
-    da_temp.load()
+    
     # perform calculation
     da_pet = xr.apply_ufunc(indices.pet,
                             da_temp_groupby,
@@ -490,6 +492,11 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
     t_end = str(max_year)+'-12-01T00:00:00.000000000'
     da_precip_cut = da_precip.sel(time=slice(t_start,t_end))
 
+    #load the data
+    if len(da_precip_cut.dims) == 4: #Deal with ECMWF data
+        da_precip_cut = da_precip_cut[:,0,:,:]
+    da_precip_cut.load()
+
     #groupby
     if 'lat' in da_temp.coords:
         da_precip_groupby = da_precip_cut.stack(point=('lat', 'lon')).groupby('point')
@@ -502,10 +509,7 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
         da_pet_groupby = da_pet.stack(point=('Y', 'X')).groupby('point')
     else:
         raise KeyError('latitude not found')
-    #load the data
-    if len(da_precip.dims) == 4: #Deal with ECMWF data
-        da_precip = da_precip[:,0,:,:]
-    da_precip.load()
+    
     #perform the calculation
     da_spei=xr.apply_ufunc(indices.spei,
                           da_precip_groupby,
