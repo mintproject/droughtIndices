@@ -25,6 +25,7 @@ This package is based upon [Climate Indices in Python](https://github.com/monoco
 This project builds upon this software package to include additional sources of climate data.
 
 ## <a name = "version">Version information</a>
+* v1.2.0: Support for non-dynamic naming of output files.
 * v1.1.0: Support for datasets from ECMWF, use JSON for configuration, optimization using xarray
 * v1.0.0: Support for datasets from FLDAS and combined netcdf file. Visualization support for SPI and SPEI. - First release
 * v0.0.1: Support for three indices and datasets from CHIRPS and GLDAS
@@ -36,8 +37,9 @@ Command line implementations:
 `python WM_climate_indices.py config.json`
 
 The config.json file contains the following fields:
-* dataset_type: the type of NetCDF files. Valid entries are GLDAS, FLDAS or CHIRPS  
+* dataset_type: the type of NetCDF files. Valid entries are GLDAS, ECMWF or CHIRPS  
 * dataset_name: Name of dataset file or parent folder
+* dynamic_name: Whether to choose a constant name (results) or allow to infer it from parameters. 
 * path: The out directory to write the index files. Index files are in NetCDF format, visualization in mp4. All years contained in a single file. Two folders will be created: figures (which contains each frame for the movie) and results, which will include both the netcdf and mp4 files. Each dataset is given a unique ID, which can be used to match data and visualization.
 * fig (bool): If True, will generate a movie.
 * name: The name of the index to be calculated. Valid entries include:
@@ -62,21 +64,21 @@ The config.json file contains the following fields:
 - An example config file is given in this repository
 
 ## <a name = "req">Requirements</a>
-Tested under Python 3.7
+Tested under Python 3.8
 
 Package requirements:
-* xarray - 0.14.1
-* dask - 2.2.0
-* netcdf4 - 1.4.2
-* bottleneck - 1.2.1
-* pandas - 0.25.3
-* numpy - 1.17.4
-* climate-indices - 1.0.6 Install this package from source (not pip) -> https://github.com/monocongo/climate_indices
-* cftime - 1.0.4.2
-* cartopy - 0.17.0 Install using conda `conda install -c conda-forge cartopy`
-* matplotlib - 3.1.0
-* imageio - 2.6.1
-* imageio-ffmpeg - 0.3.0
+* xarray 
+* dask
+* netcdf4
+* bottleneck 
+* pandas 
+* numpy 
+* climate-indices 
+* cftime 
+* cartopy 
+* matplotlib 
+* imageio 
+* imageio-ffmpeg 
 
 ## <a name = "files">Files and folders in this directory</a>
 
