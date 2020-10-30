@@ -536,13 +536,14 @@ def SPEI(da_precip, da_temp, distribution = 'gamma', periodicity = 'monthly',\
             'timescales': scales}
     return ds_spei, info
 #%% Return a netcdf using MINT conventions
-def to_netcdfMint(ds, info, dataset_type, dir_out):
+def to_netcdfMint(ds, info, dataset_type, dir_out, dynamic_name):
     """Returns a MINT-ready netcdf file with SPI values
 
     Args:
         ds (Xarray DataSet): A dataset of drought indices
         info (dict): Dictionary containing pertinent information frpm calculation
         dir_out (str): The out directory to write the netcdf files
+        dynamic_name (bool): Whether to generate a unique name dynamically using parameter settings. Otherwise returns, results.nc
 
     Returns:
         ds (xarray dataset): Metadata complete dataset (important for viz)
@@ -635,30 +636,31 @@ def to_netcdfMint(ds, info, dataset_type, dir_out):
        ds.spei.attrs['missing_value'] = np.nan
 
     #Write it out to file
-    if dir_out[-1]=='/':
-        path = dir_out+'results/'+info['index']+ '_' + ds.attrs['project'] + '_' +\
+    if dynamic_name == True:
+        f = info['index']+ '_' + ds.attrs['project'] + '_' +\
                 dataset_type+'_'+ds.attrs['time_coverage_start'].split('T')[0]+\
                 '_'+\
                 ds.attrs['time_coverage_end'].split('T')[0]+\
                 '_'+ds.attrs['id']+'.nc'
     else:
-        path = dir_out+'/results/'+info['index']+ '_' + ds.attrs['project'] + '_' +\
-                dataset_type+'_'+ds.attrs['time_coverage_start'].split('T')[0]+\
-                '_'+\
-                ds.attrs['time_coverage_end'].split('T')[0]+\
-                '_'+ds.attrs['id']+'.nc'
+        f = 'results.nc'
+    if dir_out[-1]=='/':
+        path = dir_out+'results/'+f
+    else:
+        path = dir_out+'/results/'+f
     ds.to_netcdf(path = path)
     
     return ds
 
 #%% Visualization 
     
-def visualizeDroughtIndex(ds, dir_out):
+def visualizeDroughtIndex(ds, dir_out, dynamic_name):
     """ Visualization of drought index
 
     Args:
         ds (xarray dataset): the dataset containing the index
         dir_out (str): the output directory for the visualization
+        dynamic_name (bool): Whether to generate a unique name dynamically using parameter settings. Otherwise returns, results.mp4
     """
     proj=ccrs.PlateCarree()
     idx = np.size(ds['time'])
@@ -707,6 +709,7 @@ def visualizeDroughtIndex(ds, dir_out):
         gl.xlabel_style = {'size': 12, 'color': 'gray'}
         gl.ylabel_style = {'size': 12, 'color': 'gray'}
         #save a jepg
+        
         if dir_out[-1]=='/':
             filename = dir_out+'figures/'+varname+'_t'+str(i)+'.jpeg'
         else:
@@ -716,10 +719,14 @@ def visualizeDroughtIndex(ds, dir_out):
         plt.close(fig)
 
     #create a gif
-    if dir_out[-1]=='/':
-        writer = imageio.get_writer(dir_out+'results/'+varname+'_'+ds.attrs['id']+'.mp4', fps=5)
+    if dynamic_name == True:
+        f = varname+'_'+ds.attrs['id']+'.mp4'
     else:
-        writer = imageio.get_writer(dir_out+'/results/'+varname+'_'+ds.attrs['id']+'.mp4', fps=5)
+        f = 'results.mp4'
+    if dir_out[-1]=='/':
+        writer = imageio.get_writer(dir_out+'results/'+f, fps=5)
+    else:
+        writer = imageio.get_writer(dir_out+'/results/'+f, fps=5)
 
     for filename in filenames:
         writer.append_data(imageio.imread(filename))
@@ -760,11 +767,13 @@ if __name__ == "__main__":
             calibration_end_year = int(config['index']['calibration_end_year'])
         except:
             calibration_end_year = config['index']['calibration_end_year']
+        dynamic_name = ast.literal_eval(config['output']['dynamic_name'])
         dir_out = config['output']['path']
         fig = ast.literal_eval(config['output']['fig'])
     elif ast.literal_eval(config['debug']) == 'True':
         dataset_type = 'GLDAS'
         dataset_name = 'GLDAS2.0_TP_1948_2010.nc'
+        dynamic_name = 'True'
         dir_out = './'
         index = 'SPI'
         bounding_box = [23,48,3,15]
@@ -840,7 +849,7 @@ if __name__ == "__main__":
         ds, info = SPEI(da_precip, da_temp,distribution, periodicity, scales,\
                             data_start_year, data_end_year, calibration_start_year, calibration_end_year)
     ## Write to file
-    ds = to_netcdfMint(ds, info, dataset_type, dir_out)
+    ds = to_netcdfMint(ds, info, dataset_type, dir_out,dynamic_name)
     ## Do vizualization if asked
     if fig == True:
-        visualizeDroughtIndex(ds, dir_out)
+        visualizeDroughtIndex(ds, dir_out,dynamic_name)

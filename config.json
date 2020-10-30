@@ -6,6 +6,7 @@
 },
 "output" :
   {
+  "dynamic_name" : "False",
   "path" : "./",
   "fig" : "True"
 },
@@ -15,10 +16,10 @@
   "distribution" : "gamma",
   "periodicity" : "monthly",
   "scales" : "6",
-  "data_start_year" : "2010",
-  "data_end_year" : "2018",
-  "calibration_start_year" : "1981",
-  "calibration_end_year" : "2010"
+  "data_start_year" : "1981",
+  "data_end_year" : "2010",
+  "calibration_start_year" : "2011",
+  "calibration_end_year" : "2018"
 },
 "spatial" :
   {
